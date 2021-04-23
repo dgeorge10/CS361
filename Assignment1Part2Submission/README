@@ -1,0 +1,19 @@
+Dennis George
+djg365
+
+Assignment1 Part2 submission
+
+I recommend running the solutions on TUX, but the code can be imported into IntelliJ.
+Assignment1/ contains my sequential implementation.
+Assignment1Part2/ contains my implementation for the static division of labor.
+Assignment1Part2b/ contains my implementation for the dynamic division of labor.
+
+The code can be ran by navigating to the appropriate directory and using the Makefile.
+EX.
+	cd Assignment1Part2b/
+	make square
+
+The output files should appear in bin/ once the program terminates.
+
+wiki.txt is the notes file that I created while working on my wiki entries. These values are also recorded
+in my reprt PDF file.
