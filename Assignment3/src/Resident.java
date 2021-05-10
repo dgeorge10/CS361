@@ -13,20 +13,34 @@ public abstract class Resident {
     public int bf_min;
     public int bf_max;
 
-    private GroceryStore store = null;
+    public String name;
 
-    public Resident(int nf, int fmin, int cfmin, int cfmax, int bfmin, int bfmax, GroceryStore store) {
-       this.nf = nf;
-       this.f_min = fmin;
-       this.cf_min = cfmin;
-       this.cf_max = cfmax;
-       this.bf_min = bfmin;
-       this.bf_max = bfmax;
-       this.store = store;
+    public GroceryStore store = null;
+
+    public Resident(String name, int nf, int fmin, int cfmin, int cfmax, int bfmin, int bfmax, GroceryStore store) {
+        this.name = name;
+        this.nf = nf;
+        this.f_min = fmin;
+        this.cf_min = cfmin;
+        this.cf_max = cfmax;
+        this.bf_min = bfmin;
+        this.bf_max = bfmax;
+        this.store = store;
     }
 
     public void eatFood() {}
-    public void shop() {}
-    public void nonWork() {}
+
+    public void shop() {
+        this.store.getInLine(this);
+    }
+
+    public void nonWork() {
+        try {
+            System.out.println(this.name + " is resting");
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
 }

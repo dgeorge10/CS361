@@ -3,8 +3,8 @@ public class Trucker extends Resident implements Runnable {
     // Maximum amount of food the Trucker's truck can hold
     private int kmax;
 
-    public Trucker(int nf, int fmin, int cfmin, int cfmax, int bfmin, int bfmax, GroceryStore store) {
-        super(nf, fmin, cfmin, cfmax, bfmin, bfmax, store);
+    public Trucker(String name, int nf, int fmin, int cfmin, int cfmax, int bfmin, int bfmax, GroceryStore store) {
+        super(name, nf, fmin, cfmin, cfmax, bfmin, bfmax, store);
         new Thread(this).start();
     }
 

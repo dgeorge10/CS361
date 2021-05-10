@@ -6,32 +6,31 @@ public class Farmer extends Resident implements Runnable {
     public int fs_min = 0;
     public int fs_max = 100;
 
-    public Farmer(int nf, int fmin, int cfmin, int cfmax, int bfmin, int bfmax, GroceryStore store) {
-        super(nf, fmin, cfmin, cfmax, bfmin, bfmax, store);
-
-        new Thread(this).start();
+    public Farmer(String name, int nf, int fmin, int cfmin, int cfmax, int bfmin, int bfmax, GroceryStore store) {
+        super(name, nf, fmin, cfmin, cfmax, bfmin, bfmax, store);
+        new Thread(this, "").start();
     }
 
     public void farm(){
         int amount = ThreadLocalRandom.current().nextInt(this.fs_min, this.fs_max);
         this.currentProduced = amount;
+        //System.out.println(this.name + " generated " + this.currentProduced+ " units of food");
     }
 
     public void eatFood(){
         int amount = ThreadLocalRandom.current().nextInt(this.cf_min, this.cf_max);
         this.currentEaten = amount;
         if (this.currentEaten < 0) this.currentEaten = 0;
+        //System.out.println(this.name + " ate " + this.currentEaten + " units of food");
     }
 
     public void awaitTruckerToTakeFood(){
-       // wait for trucker
+        // wait for trucker
+        System.out.println(this.name + " is waiting for trucker");
     }
 
-    @Override
-    public void shop(){
-        if (this.nf > this.f_min) { return; }
-        int amount = ThreadLocalRandom.current().nextInt(this.bf_min, this.bf_max);
-        // shop for amount from store
+    public void shopForFood() {
+        if (this.nf < this.f_min) { this.shop(); }
     }
 
     @Override
@@ -39,8 +38,8 @@ public class Farmer extends Resident implements Runnable {
         while (true) {
             this.farm();
             this.eatFood();
-            this.awaitTruckerToTakeFood();
-            this.shop();
+            //this.awaitTruckerToTakeFood();
+            this.shopForFood();
             this.nonWork();
         }
     }
