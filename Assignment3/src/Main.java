@@ -3,9 +3,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class Main {
     public static void main(String[] args) {
-        final int numFarmers = 5;
+        final int numFarmers = 10;
         final int numGroceryWorkers = 10;
-        final int numTruckers = 2;
+        final int numTruckers = 4;
         int nf = 0;
         int fmin = 10;
         int cfmin = 0;
@@ -25,7 +25,8 @@ public class Main {
 
         GroceryStore store = new GroceryStore(smax, min_sse, ss_min, ss_max, sc);
 
-        BlockingQueue<Farmer> waitingFarmers = new LinkedBlockingQueue<Farmer>(); //new Farmer[numFarmers];
+        //BlockingQueue<Farmer> waitingFarmers = new LinkedBlockingQueue<Farmer>(); //new Farmer[numFarmers];
+        BoundedBuffer<Farmer> waitingFarmers = new BoundedBuffer<>();
 
         for (int i = 0; i < numFarmers; i++) {
             System.out.println("Starting Farmer" + i);

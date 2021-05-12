@@ -1,5 +1,3 @@
-import java.util.concurrent.BlockingQueue;
-
 public class Trucker extends Resident implements Runnable {
 
     // Maximum amount of food the Trucker's truck can hold
@@ -9,10 +7,10 @@ public class Trucker extends Resident implements Runnable {
     public int currentAmount = 0;
 
     // Shared queue with Truckers to determine which farmers are waiting for a trucker to arrive
-    private BlockingQueue<Farmer> waitingFarmers;
+    private BoundedBuffer<Farmer> waitingFarmers;
 
     public Trucker(String name, int nf, int fmin, int cfmin, int cfmax, int bfmin, int bfmax, int kmax, int s_max,
-                   GroceryStore store, BlockingQueue<Farmer> waitingFarmers) {
+                   GroceryStore store, BoundedBuffer<Farmer> waitingFarmers) {
         super(name, nf, fmin, cfmin, cfmax, bfmin, bfmax, s_max, store);
         this.kmax = kmax;
         this.waitingFarmers = waitingFarmers;
@@ -77,7 +75,7 @@ public class Trucker extends Resident implements Runnable {
             this.eatFood();
             this.pickupFood();
             this.deliverFood();
-            this.shop();
+            //this.shop();
             this.nonWork();
         }
     }

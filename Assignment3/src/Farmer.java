@@ -1,4 +1,3 @@
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Farmer extends Resident implements Runnable {
@@ -7,10 +6,10 @@ public class Farmer extends Resident implements Runnable {
     public int fs_max = 100;
 
     // Shared queue with Truckers to determine which farmers are waiting for a trucker to arrive
-    private final BlockingQueue<Farmer> waitingFarmers;
+    private final BoundedBuffer<Farmer> waitingFarmers;
 
     public Farmer(String name, int nf, int fmin, int cfmin, int cfmax, int bfmin, int bfmax, int s_max,
-                  GroceryStore store, BlockingQueue<Farmer> waitingFarmers) {
+                  GroceryStore store, BoundedBuffer<Farmer> waitingFarmers) {
         super(name, nf, fmin, cfmin, cfmax, bfmin, bfmax, s_max, store);
         this.waitingFarmers = waitingFarmers;
         new Thread(this, "").start();
@@ -48,10 +47,6 @@ public class Farmer extends Resident implements Runnable {
         }
     }
 
-    public void shopForFood() {
-        this.shop();
-    }
-
     /*
     Life cycle of a farmer:
     1. Farm
@@ -66,7 +61,7 @@ public class Farmer extends Resident implements Runnable {
             this.farm();
             this.eatFood();
             this.awaitTruckerToTakeFood();
-            this.shopForFood();
+            //this.shop();
             this.nonWork();
         }
     }
