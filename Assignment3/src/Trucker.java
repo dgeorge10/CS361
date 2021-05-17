@@ -75,7 +75,7 @@ public class Trucker extends Resident implements Runnable {
             this.eatFood();
             this.pickupFood();
             this.deliverFood();
-            //this.shop();
+            this.shop();
             this.nonWork();
         }
     }

@@ -3,7 +3,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Farmer extends Resident implements Runnable {
     // Range of values for amount of food farmed
     public int fs_min = 0;
-    public int fs_max = 100;
+    public int fs_max = 10;
 
     // Shared queue with Truckers to determine which farmers are waiting for a trucker to arrive
     private final BoundedBuffer<Farmer> waitingFarmers;
@@ -61,7 +61,7 @@ public class Farmer extends Resident implements Runnable {
             this.farm();
             this.eatFood();
             this.awaitTruckerToTakeFood();
-            //this.shop();
+            this.shop();
             this.nonWork();
         }
     }

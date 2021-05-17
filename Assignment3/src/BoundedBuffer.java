@@ -50,15 +50,19 @@ public class BoundedBuffer<E> {
         try {
             // wait for the put in lock
             this.putIn.acquire();
+
+            //TODO
+            if(this.size == this.capacity) {
+            }
+
             this.sizeLock.acquire();
-            // TODO: what happens if the queue is full? should it be unbounded?
             if(this.size < this.capacity) {
                 this.tail = this.tail.next = newNode;
                 this.size += 1;
             }
+            this.sizeLock.release();
         } finally {
             this.putIn.release();
-            this.sizeLock.release();
         }
     }
 
@@ -71,18 +75,15 @@ public class BoundedBuffer<E> {
         E element;
         try {
             this.takeOut.acquire();
-            this.sizeLock.acquire();
-            if(this.size == 0) {
-                System.out.println("nothing on the queue to take out");
-            }
             Node<E> h = this.head;
             Node<E> first = h.next;
             this.head = first;
             element = first.data;
             first.data = null;
+            this.sizeLock.acquire();
             this.size -= 1;
-        } finally {
             this.takeOut.release();
+        } finally {
             this.sizeLock.release();
         }
         return element;

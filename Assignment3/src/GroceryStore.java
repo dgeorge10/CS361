@@ -29,6 +29,8 @@ public class GroceryStore {
     public int customersServed;
 
     // Queue of residents that are waiting to buy food
+    // Not using the BoundedBuffer queue class because it is of fixed length
+    // and my implementation for the synchronous queue does not handle sizes
     public Resident[] queue;
 
     // Index the store is currently entering/removing residents from the queue
@@ -52,9 +54,9 @@ public class GroceryStore {
         this.ss_max = ss_max;
         this.ss_min = ss_min;
         this.min_sse = min_sse;
-        this.sc = sc + 1;
+        this.sc = sc;
 
-        this.currentFoodQuantity = 0;
+        this.currentFoodQuantity = 1000;
 
         this.maxCustomers = ThreadLocalRandom.current().nextInt(this.ss_min, this.ss_max);
         this.currentWorkerCount = 0;
@@ -125,7 +127,7 @@ public class GroceryStore {
             // if we are trying to put a resident at the end of the queue, block them from adding, and send them
             // to their next stage in their lifecycle
             // switch to using a counter
-            if (takeOut == (putIn + 1) % this.sc) {
+            if (this.putIn == this.sc) {
                 System.out.println("Store is full, not putting " + resident.name + " in line");
                 resident.waiting.release();
                 return;
@@ -136,6 +138,7 @@ public class GroceryStore {
                 putIn = (putIn + 1) % this.sc;
             }
             this.queueSize.release();
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
@@ -153,7 +156,7 @@ public class GroceryStore {
 
             // Check to see if store is still open after acquiring a new customer
             if (!this.open) {
-                this.queueSize.release();
+                // this.queueSize.release();
                 return;
             }
 
