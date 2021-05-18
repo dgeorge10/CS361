@@ -1,3 +1,4 @@
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -22,6 +23,7 @@ public class BoundedBuffer<E> {
     private Semaphore sizeLock;
     private Semaphore putIn;
     private Semaphore takeOut;
+    private Semaphore length;
 
     // keep track of tail of list for easy insertion
     private Node<E> head;
@@ -30,13 +32,14 @@ public class BoundedBuffer<E> {
     public BoundedBuffer() { this(Integer.MAX_VALUE); }
 
     public BoundedBuffer(int capacity) {
-        if (size >= 0) {
+        if (this.capacity >= 0) {
             this.tail = this.head = new Node<E>(null);
             this.size = 0;
             this.capacity = capacity;
             this.putIn = new Semaphore(1);
             this.takeOut = new Semaphore(1);
             this.sizeLock = new Semaphore(1);
+            this.length = new Semaphore(0);
         }
     }
 
@@ -45,25 +48,27 @@ public class BoundedBuffer<E> {
      * @param item to put on the queue
      * @throws InterruptedException
      */
-    public void put(E item) throws InterruptedException {
+    public boolean put(E item) throws InterruptedException {
         Node<E> newNode = new Node<>(item);
         try {
             // wait for the put in lock
             this.putIn.acquire();
 
-            //TODO
+            this.sizeLock.acquire();
             if(this.size == this.capacity) {
+                return false;
             }
 
-            this.sizeLock.acquire();
             if(this.size < this.capacity) {
                 this.tail = this.tail.next = newNode;
                 this.size += 1;
+                this.length.release();
             }
-            this.sizeLock.release();
         } finally {
+            this.sizeLock.release();
             this.putIn.release();
         }
+        return true;
     }
 
     /**
@@ -74,6 +79,7 @@ public class BoundedBuffer<E> {
     public E take() throws InterruptedException {
         E element;
         try {
+            this.length.acquire();
             this.takeOut.acquire();
             Node<E> h = this.head;
             Node<E> first = h.next;

@@ -1,6 +1,5 @@
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class GroceryStore {
     // Maximum food units for grocery store
@@ -29,12 +28,7 @@ public class GroceryStore {
     public int customersServed;
 
     // Queue of residents that are waiting to buy food
-    // Not using the BoundedBuffer queue class because it is of fixed length
-    // and my implementation for the synchronous queue does not handle sizes
-    public Resident[] queue;
-
-    // Index the store is currently entering/removing residents from the queue
-    public int putIn = 0, takeOut = 0;
+    public BoundedBuffer<Resident> queue;
 
     // Boolean flag to determine when the store is open
     public boolean open = true;
@@ -44,10 +38,6 @@ public class GroceryStore {
 
     // Semaphore to determine whether we are waiting for enough workers to open the store
     public Semaphore waiting = null;
-
-    // Semaphores to control access to the queue
-    public Semaphore queueSize = null;
-    public Semaphore queueSpaces = null;
 
     public GroceryStore(int smax, int min_sse, int ss_min, int ss_max, int sc) {
         this.smax = smax;
@@ -61,12 +51,11 @@ public class GroceryStore {
         this.maxCustomers = ThreadLocalRandom.current().nextInt(this.ss_min, this.ss_max);
         this.currentWorkerCount = 0;
 
+        // Semaphore to act as a mutex lock
         this.mutex = new Semaphore(1);
 
         // Semaphores for the line
-        this.queue = new Resident[this.sc];
-        this.queueSize = new Semaphore(0);
-        this.queueSpaces = new Semaphore(this.smax);
+        this.queue = new BoundedBuffer<>(this.sc);
 
         // Semaphore for waiting for appropriate amount of workers to arrive
         this.waiting = new Semaphore(0);
@@ -122,27 +111,14 @@ public class GroceryStore {
      */
     public void getInLine(Resident resident) {
         try {
-            this.mutex.acquire();
-            this.queueSpaces.acquire();
-            // if we are trying to put a resident at the end of the queue, block them from adding, and send them
-            // to their next stage in their lifecycle
-            // switch to using a counter
-            if (this.putIn == this.sc) {
-                System.out.println("Store is full, not putting " + resident.name + " in line");
-                resident.waiting.release();
-                return;
+            if (this.queue.put(resident)) {
+                System.out.println("Successfully added " + resident.name + " in the store queue");
             } else {
-                // put the resident in the queue
-                System.out.println(resident.name + " is getting in line to shop");
-                queue[putIn] = resident;
-                putIn = (putIn + 1) % this.sc;
+                System.out.println("Failed to add " + resident.name + " in the store queue");
+                resident.waiting.release();
             }
-            this.queueSize.release();
-
         } catch (InterruptedException e) {
             e.printStackTrace();
-        } finally {
-            this.mutex.release();
         }
     }
 
@@ -151,23 +127,15 @@ public class GroceryStore {
      */
     public void serviceCustomer() {
         try {
-            this.queueSize.acquire();
-            this.mutex.acquire();
+            Resident r = this.queue.take();
 
-            // Check to see if store is still open after acquiring a new customer
-            if (!this.open) {
-                // this.queueSize.release();
-                return;
-            }
-
-            Resident r = this.queue[takeOut];
             System.out.println("Serving: " + r.name);
-            takeOut = (takeOut + 1) % this.sc;
 
             // Subtract amount of food resident is buying from the store total
-            // TODO: wait for a trucker to arrive with food
             int customerAmount = r.getBuyFoodAmount();
             if (this.currentFoodQuantity < customerAmount) {
+                // put customer in the back of the line (tough luck)
+                this.getInLine(r);
                 return;
             }
 
@@ -182,14 +150,11 @@ public class GroceryStore {
                 System.out.println("Served maximum amount of customers for the day");
                 this.open = false;
             }
-            this.queueSpaces.release();
 
             // Allow the Resident to go back to whatever they needs to do
             r.waiting.release();
         } catch (InterruptedException e) {
             e.printStackTrace();
-        } finally {
-            this.mutex.release();
         }
     }
 

@@ -13,6 +13,9 @@ public class Main {
         int bfmin = 2;
         int bfmax = 20;
 
+        int fs_min = 1;
+        int fs_max = 20;
+
         int smax = 10000;
         int sc = 2;
         int min_sse = 1;
@@ -29,7 +32,6 @@ public class Main {
         for (int i = 0; i < args.length - 1; i++) {
             argName = args[i];
             argValue = args[i+1];
-
             try {
                 switch (argName) {
                     case "-f":
@@ -74,8 +76,14 @@ public class Main {
                     case "-kmax":
                         kmax = Integer.parseInt(argValue);
                         break;
-                    case "s_max":
+                    case "-s_max":
                         s_max = Integer.parseInt(argValue);
+                        break;
+                    case "-fs_min":
+                        fs_min = Integer.parseInt(argValue);
+                        break;
+                    case "-fs_max":
+                        fs_max = Integer.parseInt(argValue);
                         break;
                 }
             } catch (Exception ex) {
@@ -86,11 +94,11 @@ public class Main {
 
         GroceryStore store = new GroceryStore(smax, min_sse, ss_min, ss_max, sc);
 
-        BoundedBuffer<Farmer> waitingFarmers = new BoundedBuffer<>();
+        BoundedBuffer<Farmer> waitingFarmers = new BoundedBuffer<>(numFarmers);
 
         for (int i = 0; i < numFarmers; i++) {
             System.out.println("Starting Farmer" + i);
-            new Farmer("Farmer"+i, nf, fmin, cfmin, cfmax, bfmin, bfmax, s_max, store, waitingFarmers);
+            new Farmer("Farmer"+i, nf, fmin, cfmin, cfmax, bfmin, bfmax, s_max, fs_min, fs_max, store, waitingFarmers);
         }
 
         for (int i = 0; i < numGroceryWorkers; i++) {
@@ -99,6 +107,7 @@ public class Main {
         }
 
         for (int i = 0; i < numTruckers; i++) {
+            System.out.println("Starting Trucker" + i);
             new Trucker("Trucker"+i, nf, fmin, cfmin, cfmax, bfmin, bfmax, kmax, s_max, store, waitingFarmers);
         }
 

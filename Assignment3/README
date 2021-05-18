@@ -1,0 +1,19 @@
+Dennis George
+Assigment 3 README
+
+This program simulates the interactions between multiple agents in a hypothetical society.
+There are three different types of residents:
+	Farmers
+	Truckers
+	GroceryWorkers
+
+Each Resident has its own rules for how they interact with each other.
+These rules are detailed in my report, and also the assignment guidelines.
+
+Running the program:
+	make small
+	make large
+			
+The simulation will be run with either large or small parameters. See the Makefile for details.
+To stop, use Ctrl + c. Please also see Makefile for details on the parameters that need to be passed in order for the simlation to run. 
+Every one of the targets that I have included, has all of the appropriate parameters. Any missing parameters will cause the program to not run.

@@ -27,6 +27,7 @@ public class Trucker extends Resident implements Runnable {
      */
     public void pickupFood() {
         try {
+            System.out.println(this.name + " is waiting for a farmer to help");
             Farmer f = this.waitingFarmers.take();
             System.out.println(this.name + " is helping " + f.name);
             int amount = f.getFoodForTrucker();
@@ -53,7 +54,6 @@ public class Trucker extends Resident implements Runnable {
      */
     public void deliverFood() {
         try {
-            System.out.println("Food delivered to grocery store");
             this.store.acceptDelivery(this);
             this.waiting.acquire();
         } catch (InterruptedException e) {
