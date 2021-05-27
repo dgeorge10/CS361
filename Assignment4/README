@@ -1,0 +1,18 @@
+Dennis George
+Assignment 4 README
+
+This program simulates the interactions between Dogs of different breeds and a Kennel.
+There are three different breeds of dogs: Ridgeback, Coonhounds, and Doodles.
+Each dog tries to get in line to eat, and then waits its turn to eat.
+No two breeds are allowed to eat together. Many dogs of the same breed can go in to the kennel at the same time.
+The only exception is the Doodle, as only one Doodle is allowed in due to the assignment outlines.
+
+To run:
+    make small
+    make large
+
+The simulation will be run with either large or small parameters. The only parameters that can be passed in
+are the amounts of each type of dog. Look at the Makefile to see how this is done. To stop, use Ctrl + C.
+
+For the Promela programs, use spin in order to run them. The output should show you everything you need.
+EX. spin -run spin/students.pml
